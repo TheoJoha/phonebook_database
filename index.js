@@ -1,8 +1,9 @@
 require('dotenv').config()
 const express = require('express')
-// const morgan = require('morgan')
+const morgan = require('morgan')
 const app = express()
-// const cors = require('cors')
+const cors = require('cors')
+
 const Person = require('./models/person')
 
 
@@ -22,7 +23,7 @@ const unknownEndpoint = (request, response) => {
 // MongoDB
 
 // DO NOT SAVE YOUR PASSWORD TO GITHUB!!
-const url = process.env.MONGODB_URI
+/* const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
 
@@ -32,10 +33,10 @@ mongoose.connect(url)
   })
   .catch((error) => {
     console.log('error connecting to MongoDB:', error.message)
-  })
+  }) */
 
-// set some pre-defined entries
-let entries = [
+// set some pre-defined persons
+let persons = [
     { 
         "id": 1,
         "name": "Arto Hellas", 
@@ -58,7 +59,7 @@ let entries = [
       }
   ]
 
-let information = `Phonebook has info for ${entries.length} people`
+let information = `Phonebook has info for ${persons.length} people`
 
 let date = new Date()
 date = date.toString()
@@ -77,29 +78,27 @@ app.get('/info', (request, response) => {
     response.json(Object.values(infoDateObj))
   })
 
-// get an entry
-app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
-    response.json(person)
-  })
-})
 
-// delete an entry
+
+// delete a person
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    entries = entries.filter(entry => entry.id !== id)
+    persons = persons.filter(person => person.id !== id)
   
     response.status(204).end()
   })
 
-// get all entries
-/* app.get('/api/persons', (request, response) => {
-    response.json(entries)
-}) */
-
+// get all persons
 app.get('/api/persons', (request, response) => {
-  Note.find({}).then(persons => {
+  Person.find({}).then(persons => {
     response.json(persons)
+  })
+})
+
+// get a person
+app.get('/api/persons/:id', (request, response) => {
+  Person.findById(request.params.id).then(person => {
+    response.json(person)
   })
 })
 
@@ -123,8 +122,8 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    for (let i = 0; i < entries.length; i++) {
-        if (body.name == entries[i].name) {
+    for (let i = 0; i < persons.length; i++) {
+        if (body.name == persons[i].name) {
             return response.status(400).json({ 
             error: 'name must be unique'
             })
@@ -140,7 +139,6 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
       response.json(savedPerson)
     })
-
 })
 
 morgan.token('body', req => {

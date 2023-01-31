@@ -1,0 +1,6 @@
+DELETE http://localhost:3001/api/persons/:id
+content-type: application/json
+
+{
+    "id": "63d6bb2f1b626e6afe0decad"
+}

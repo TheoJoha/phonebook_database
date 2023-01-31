@@ -12,6 +12,7 @@ app.use(express.json())
 app.use(morgan(':method :url :body'))
 app.use(express.static('build'))
 
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
@@ -19,6 +20,21 @@ function getRandomInt(max) {
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
+
+app.use(unknownEndpoint)
+
+// error-handler
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler) // this has to be the last loaded middleware
 
 // MongoDB
 
@@ -78,14 +94,13 @@ app.get('/info', (request, response) => {
     response.json(Object.values(infoDateObj))
   })
 
-
-
 // delete a person
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-  
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id)
+      .then(result => {
+        response.status(204).end()
+      })
+      .catch(error => next(error))
   })
 
 // get all persons
@@ -96,10 +111,16 @@ app.get('/api/persons', (request, response) => {
 })
 
 // get a person
-app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
-    response.json(person)
-  })
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end() 
+      }
+    })
+    .catch(error => next(error))
 })
 
 
@@ -145,7 +166,6 @@ morgan.token('body', req => {
     return JSON.stringify(req.body)
   })
   
-app.use(unknownEndpoint)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

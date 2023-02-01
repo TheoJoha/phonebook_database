@@ -18,7 +18,9 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }
@@ -92,13 +94,13 @@ app.get('/info', (request, response) => {
  
 // delete a person
 app.delete('/api/per/sons/:id', (request, response, next) => {
-  // const articleId = Mongoose.Types.ObjectId(req.params.id);
-  Person.findByIdAndRemove(request.params.id)
-    .then(result => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
-})
+    // const articleId = Mongoose.Types.ObjectId(req.params.id);
+    Person.findByIdAndRemove(request.params.id)
+      .then(result => {
+        response.status(204).end()
+      })
+      .catch(error => next(error))
+  })
 
 // get all persons
 app.get('/api/persons', (request, response) => {
@@ -122,7 +124,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 
 // add a person
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     // randNum = getRandomInt(10000)
@@ -144,6 +146,7 @@ app.post('/api/persons', (request, response) => {
         if (body.name == persons[i].name) {
             return response.status(400).json({ 
             error: 'name must be unique'
+
             })
         }
     }
@@ -154,9 +157,12 @@ app.post('/api/persons', (request, response) => {
       // id: body.randNum,
     })
   
-    person.save().then(savedPerson => {
+    person.save()
+      .then(savedPerson => {
       response.json(savedPerson)
     })
+      .catch(error => next(error))
+
 })
 
 morgan.token('body', req => {

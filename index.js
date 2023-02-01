@@ -91,9 +91,9 @@ app.get('/info', (request, response) => {
   })
 
 // delete a person
-app.delete('/api/persons/:id', (request, response, next) => {
-    const articleId = Mongoose.Types.ObjectId(req.params.id);
-    Person.findByIdAndRemove(articleId)
+app.delete('/api/per/sons/:id', (request, response, next) => {
+    // const articleId = Mongoose.Types.ObjectId(req.params.id);
+    Person.findByIdAndRemove(request.params.id)
       .then(result => {
         response.status(204).end()
       })

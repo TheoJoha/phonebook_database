@@ -89,16 +89,16 @@ testList.push(infoDateObj.date)
 app.get('/info', (request, response) => {
     response.json(Object.values(infoDateObj))
   })
-
+ 
 // delete a person
 app.delete('/api/per/sons/:id', (request, response, next) => {
-    // const articleId = Mongoose.Types.ObjectId(req.params.id);
-    Person.findByIdAndRemove(request.params.id)
-      .then(result => {
-        response.status(204).end()
-      })
-      .catch(error => next(error))
-  })
+  // const articleId = Mongoose.Types.ObjectId(req.params.id);
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
 
 // get all persons
 app.get('/api/persons', (request, response) => {
@@ -141,10 +141,20 @@ app.post('/api/persons', (request, response) => {
     }
 
     for (let i = 0; i < persons.length; i++) {
-        if (body.name == persons[i].name) {
-            return response.status(400).json({ 
-            error: 'name must be unique'
-            })
+        if (new_body.name == persons[i].name) {
+          const person = {
+            name: new_body.name,
+            num: new_body.num,
+          }
+            app.put(`api/persons/${request.params.id}`, (request, respone, next) => {
+
+                Person.findByIdAndUpdate(request.params.id, person, { new: true })
+                .then(updatedPerson => {
+                  response.json(updatedPerson)
+                })
+                .catch(error => next(error))
+            }
+            )
         }
     }
 

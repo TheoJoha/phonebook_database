@@ -92,7 +92,8 @@ app.get('/info', (request, response) => {
 
 // delete a person
 app.delete('/api/persons/:id', (request, response, next) => {
-    Person.findByIdAndDelete(request.params.id)
+    const articleId = Mongoose.Types.ObjectId(req.params.id);
+    Person.findByIdAndRemove(articleId)
       .then(result => {
         response.status(204).end()
       })

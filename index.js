@@ -141,20 +141,10 @@ app.post('/api/persons', (request, response) => {
     }
 
     for (let i = 0; i < persons.length; i++) {
-        if (new_body.name == persons[i].name) {
-          const person = {
-            name: new_body.name,
-            num: new_body.num,
-          }
-            app.put(`api/persons/${request.params.id}`, (request, respone, next) => {
-
-                Person.findByIdAndUpdate(request.params.id, person, { new: true })
-                .then(updatedPerson => {
-                  response.json(updatedPerson)
-                })
-                .catch(error => next(error))
-            }
-            )
+        if (body.name == persons[i].name) {
+            return response.status(400).json({ 
+            error: 'name must be unique'
+            })
         }
     }
 

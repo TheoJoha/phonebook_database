@@ -1,27 +1,16 @@
-require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
+require('dotenv').config()
 
 const Person = require('./models/person')
 
 
-app.use(cors())
-app.use(express.json())
-app.use(morgan(':method :url :body'))
-app.use(express.static('build'))
 
-
-function getRandomInt(max) {
+/* function getRandomInt(max) {
     return Math.floor(Math.random() * max);
-  }
-
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
-app.use(unknownEndpoint)
+  } */
 
 // error-handler
 const errorHandler = (error, request, response, next) => {
@@ -34,7 +23,14 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-app.use(errorHandler) // this has to be the last loaded middleware
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(cors())
+app.use(express.json())
+app.use(morgan(':method :url :body'))
+app.use(express.static('build'))
 
 // MongoDB
 
@@ -128,7 +124,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    randNum = getRandomInt(10000)
+    // randNum = getRandomInt(10000)
 
     // error checks
     if (body.num === undefined) {
@@ -154,7 +150,7 @@ app.post('/api/persons', (request, response) => {
     const person = new Person({
       name: body.name,
       num: body.num,
-      id: body.randNum,
+      // id: body.randNum,
     })
   
     person.save().then(savedPerson => {
@@ -165,7 +161,9 @@ app.post('/api/persons', (request, response) => {
 morgan.token('body', req => {
     return JSON.stringify(req.body)
   })
-  
+
+app.use(unknownEndpoint)
+app.use(errorHandler) // this has to be the last loaded middleware
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

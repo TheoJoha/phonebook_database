@@ -29,6 +29,7 @@ app.use(express.json())
 app.use(morgan(':method :url :body'))
 app.use(express.static('build'))
 
+persons = []
 
 let information = `Phonebook has info for ${persons.length} people`
 

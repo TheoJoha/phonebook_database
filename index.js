@@ -136,7 +136,7 @@ app.post('/api/persons', (request, response, next) => {
         })
     }
 
-    if (!body.name === undefined) {
+    if (body.name === undefined) {
         return response.status(400).json({ 
         error: 'name missing' 
         })

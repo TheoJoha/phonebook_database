@@ -7,11 +7,6 @@ require('dotenv').config()
 const Person = require('./models/person')
 
 
-
-/* function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  } */
-
 // error-handler
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
@@ -34,44 +29,6 @@ app.use(express.json())
 app.use(morgan(':method :url :body'))
 app.use(express.static('build'))
 
-// MongoDB
-
-// DO NOT SAVE YOUR PASSWORD TO GITHUB!!
-/* const url = process.env.MONGODB_URI
-
-console.log('connecting to', url)
-
-mongoose.connect(url)
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
-  }) */
-
-// set some pre-defined persons
-let persons = [
-    { 
-        "id": 1,
-        "name": "Arto Hellas", 
-        "num": "040-123456"
-      },
-      { 
-        "id": 2,
-        "name": "Ada Lovelace", 
-        "num": "39-44-5323523"
-      },
-      { 
-        "id": 3,
-        "name": "Dan Abramov", 
-        "num": "12-43-234345"
-      },
-      { 
-        "id": 4,
-        "name": "Mary Poppendieck", 
-        "num": "39-23-6423122"
-      }
-  ]
 
 let information = `Phonebook has info for ${persons.length} people`
 
@@ -146,7 +103,6 @@ app.post('/api/persons', (request, response, next) => {
         if (body.name == persons[i].name) {
             return response.status(400).json({ 
             error: 'name must be unique'
-
             })
         }
     }
@@ -162,7 +118,6 @@ app.post('/api/persons', (request, response, next) => {
       response.json(savedPerson)
     })
       .catch(error => next(error))
-
 })
 
 morgan.token('body', req => {

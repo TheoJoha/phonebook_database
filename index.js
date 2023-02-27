@@ -29,36 +29,37 @@ app.use(express.json())
 app.use(morgan(':method :url :body'))
 app.use(express.static('build'))
 
-persons = []
+let persons = []
+
 
 let information = `Phonebook has info for ${persons.length} people`
 
 let date = new Date()
 date = date.toString()
 
-infoDateObj = {
-    info: information,
-    date: date
+let infoDateObj = {
+  info: information,
+  date: date
 }
 
-testList = []
+let testList = []
 testList.push(infoDateObj.info)
 testList.push(infoDateObj.date)
 
 // get info
 app.get('/info', (request, response) => {
-    response.json(Object.values(infoDateObj))
-  })
- 
+  response.json(Object.values(infoDateObj))
+})
+
 // delete a person
 app.delete('/api/per/sons/:id', (request, response, next) => {
-    // const articleId = Mongoose.Types.ObjectId(req.params.id);
-    Person.findByIdAndRemove(request.params.id)
-      .then(result => {
-        response.status(204).end()
-      })
-      .catch(error => next(error))
-  })
+  // const articleId = Mongoose.Types.ObjectId(req.params.id);
+  Person.findByIdAndRemove(request.params.id)
+    .then(
+      response.status(204).end()
+    )
+    .catch(error => next(error))
+})
 
 // get all persons
 app.get('/api/persons', (request, response) => {
@@ -74,61 +75,57 @@ app.get('/api/persons/:id', (request, response, next) => {
       if (person) {
         response.json(person)
       } else {
-        response.status(404).end() 
+        response.status(404).end()
       }
     })
     .catch(error => next(error))
 })
 
-
 // add a person
 app.post('/api/persons', (request, response, next) => {
-    const body = request.body
+  const body = request.body
 
-    // randNum = getRandomInt(10000)
-
-    // error checks
-    if (body.num === undefined) {
-        return response.status(400).json({ 
-        error: 'number missing' 
-        })
-    }
-
-    if (body.name === undefined) {
-        return response.status(400).json({ 
-        error: 'name missing' 
-        })
-    }
-
-    for (let i = 0; i < persons.length; i++) {
-        if (body.name == persons[i].name) {
-            return response.status(400).json({ 
-            error: 'name must be unique'
-            })
-        }
-    }
-
-    const person = new Person({
-      name: body.name,
-      num: body.num,
-      // id: body.randNum,
+  // error checks
+  if (body.num === undefined) {
+    return response.status(400).json({
+      error: 'number missing'
     })
-  
-    person.save()
-      .then(savedPerson => {
+  }
+
+  if (body.name === undefined) {
+    return response.status(400).json({
+      error: 'name missing'
+    })
+  }
+
+  for (let i = 0; i < persons.length; i++) {
+    if (body.name === persons[i].name) {
+      return response.status(400).json({
+        error: 'name must be unique'
+      })
+    }
+  }
+
+  const person = new Person({
+    name: body.name,
+    num: body.num,
+  })
+
+  person.save()
+    .then(savedPerson => {
       response.json(savedPerson)
     })
-      .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 morgan.token('body', req => {
-    return JSON.stringify(req.body)
-  })
+  return JSON.stringify(req.body)
+})
 
 app.use(unknownEndpoint)
 app.use(errorHandler) // this has to be the last loaded middleware
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001 // Lint is not in full agreement
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })

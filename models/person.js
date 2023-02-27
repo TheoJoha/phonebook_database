@@ -22,7 +22,7 @@ const personSchema = new mongoose.Schema({
     required: [true, 'name is required'],
     validate: {
       validator: function(v) {
-        if (v.length >= 3) {
+        if (v.length <= 2) {
           return false
         }
       },
